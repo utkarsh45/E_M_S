@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <form class="box" #signUpForm="ngForm" (ngSubmit)="signUpForm.valid && onSubmit(signUpForm)">
+                        <h1>Register</h1>
+                        <input type="text" #fullName="ngModel" [(ngModel)]="userService.selectedUser.fullName" name="fullName" placeholder="Name" required [ngClass]="{'invalid-textbox': signUpForm.submitted && !fullName.valid }">
+                        <input type="text" #email="ngModel" [(ngModel)]="userService.selectedUser.email" name="email" placeholder="Email ID" required [pattern]="emailRegex" [ngClass]="{'invalid-textbox': signUpForm.submitted && !email.valid }">
+                        <div *ngIf="signUpForm.submitted && email.errors">
+                            <label *ngIf="email.errors.required" class="validation-message">This field is required.</label>
+                            <label *ngIf="email.errors.pattern" class="validation-message">Invalid email address.</label>
+                        </div>
+                        <input type="password" #password="ngModel" [(ngModel)]="userService.selectedUser.password" name="password" placeholder="Password" minlength="6" required [ngClass]="{'invalid-textbox': signUpForm.submitted && !password.valid }">
+                        <div *ngIf="signUpForm.submitted && password.errors">
+                            <label *ngIf="password.errors.required" class="validation-message">This field is required.</label>
+                            <label *ngIf="password.errors.minlength" class="validation-message">Enter atleast 6 characters.</label>
+                        </div>
+                        <input type="submit" name="" value="Register">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Success message -->
+    <div class="success" *ngIf="showSucessMessage">
+        Saved successfully
+    </div>
+
+    <!-- Error message -->
+    <div class="alert" *ngIf="serverErrorMessages">
+        {{serverErrorMessages}}
+    </div>
+</body>
+
+</html>
