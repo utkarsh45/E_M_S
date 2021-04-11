@@ -13,33 +13,23 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <form class="box" #signUpForm="ngForm" (ngSubmit)="signUpForm.valid && onSubmit(signUpForm)">
+                    <form class="box" [formGroup]="postUser" (ngSubmit)="registerUser()">
                         <h1>Register</h1>
-                        <input type="text" #fullName="ngModel" [(ngModel)]="userService.selectedUser.fullName" name="fullName" placeholder="Name" required [ngClass]="{'invalid-textbox': signUpForm.submitted && !fullName.valid }">
-                        <input type="text" #email="ngModel" [(ngModel)]="userService.selectedUser.email" name="email" placeholder="Email ID" required [pattern]="emailRegex" [ngClass]="{'invalid-textbox': signUpForm.submitted && !email.valid }">
-                        <div *ngIf="signUpForm.submitted && email.errors">
-                            <label *ngIf="email.errors.required" class="validation-message">This field is required.</label>
-                            <label *ngIf="email.errors.pattern" class="validation-message">Invalid email address.</label>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" formControlName="fullName" placeholder="Name" required>
                         </div>
-                        <input type="password" #password="ngModel" [(ngModel)]="userService.selectedUser.password" name="password" placeholder="Password" minlength="6" required [ngClass]="{'invalid-textbox': signUpForm.submitted && !password.valid }">
-                        <div *ngIf="signUpForm.submitted && password.errors">
-                            <label *ngIf="password.errors.required" class="validation-message">This field is required.</label>
-                            <label *ngIf="password.errors.minlength" class="validation-message">Enter atleast 6 characters.</label>
+                        <div class="form-group">
+                            <input type="text" class="form-control" formControlName="email" placeholder="Email ID" required [pattern]="emailRegex">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" formControlName="password" placeholder="Password" minlength="6" required>
                         </div>
                         <input type="submit" name="" value="Register">
                     </form>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Success message -->
-    <div class="success" *ngIf="showSucessMessage">
-        Saved successfully
-    </div>
-
-    <!-- Error message -->
-    <div class="alert" *ngIf="serverErrorMessages">
-        {{serverErrorMessages}}
     </div>
 </body>
 

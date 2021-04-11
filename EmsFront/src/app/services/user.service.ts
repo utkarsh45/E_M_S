@@ -1,33 +1,37 @@
 import { Injectable } from '@angular/core';
 import { User } from '../modClass/user.model';
-import { PostUser } from "../modClass/post-user";
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { RouterModule } from '@angular/router';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  selectedUser: User = {
-    fullName: '',
-    email: '',
-    password: ''
-  };
+  API_URL: string = 'http://localhost:27017/api';
+  headers = new HttpHeaders().set('Content-Type', 'application/json');
+  currentUser = {};
 
-  currentUser: PostUser = {
-    email: '',
-    password: ''
-  };
+  constructor(private httpClient: HttpClient,public router: Router){}
 
-  constructor( private http: HttpClient, public route: RouterModule  ) { }
-  // tslint:disable-next-line:typedef
-  postUser(user: User){
-    return this.http.post(environment.apiBaseUrl + '/register', user);
+  postUser(user: User): Observable<any> {
+
+    return this.httpClient.post(`${this.API_URL}/register`, user).pipe(
+        catchError(this.handleError)
+    )
+  }
+  handleError(error: HttpErrorResponse) {
+    let msg = '';
+    if (error.error instanceof ErrorEvent) {
+      // client-side error
+      msg = error.error.message;
+    } else {
+      // server-side error
+      msg = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    return throwError(msg);
   }
   // tslint:disable-next-line:typedef
-  postlogin( user: User ) {
-    return this.http.post( environment.apiBaseUrl + '/login', user );
-  }
 }

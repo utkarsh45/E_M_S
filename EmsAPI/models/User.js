@@ -47,6 +47,16 @@ userSchema.pre('save', function(next) {
         });
     });
 });
+
+userSchema.pre('search', (next) => {
+    console.log('11');
+    var user = this;
+    user.findOne({ 'email': req.body.email }, function(err, user) {
+        console.log('5');
+        next();
+        // if (!user) return res.json({ isAuth: false, message: ' Auth failed ,email not found' });
+    })
+});
 userSchema.methods.comparepassword = function(password, cb) {
     bcrypt.compare(password, this.password, function(err, isMatch) {
         if (err) return cb(next);

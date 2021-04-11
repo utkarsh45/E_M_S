@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { io } from 'socket.io-client';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent implements OnInit {
   private socket: any;
   public data: any;
 
-  constructor() {
+  constructor(public authService: AuthService) {
     this.socket = io('http://localhost:27017');
   }
 
