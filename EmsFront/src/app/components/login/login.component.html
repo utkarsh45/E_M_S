@@ -13,16 +13,20 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <form class="box">
+                    <form class="box" #loginForm="ngForm" (ngSubmit)="loginForm.valid && onSubmit(loginForm)">
                         <h1>Login</h1>
                         <p class="text-muted"> Please enter your Email ID and Password!</p>
-                        <input type="text" name="" placeholder="Email ID">
-                        <input type="password" name="" placeholder="Password">
-                        <input type="submit" name="" value="Login" [routerLink]="['/dashboard']">
+                        <input type="text" #fullName="ngModel" [(ngModel)]="userService.currentUser.email" name="email" placeholder="Email ID" required>
+                        <input type="password" [(ngModel)]="userService.currentUser.password" name="password" placeholder="Password" required>
+                        <input type="submit" name="" value="Login">
                     </form>
                 </div>
             </div>
         </div>
+    </div>
+    <!-- Error message -->
+    <div class="alert" *ngIf="serverErrorMessages">
+        {{serverErrorMessages}}
     </div>
 </body>
 

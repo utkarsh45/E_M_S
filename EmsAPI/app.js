@@ -3,11 +3,12 @@ const connectDB = require('./config/db');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-require('./config/passport');
-const passport = require('passport');
+
 const cors = require('cors');
 const api = require('./routes/api');
 const socketio = require('socket.io');
+const cookieParser = require('cookie-parser');
+
 
 
 //Connecting to MongoDB
@@ -23,18 +24,25 @@ const io = socketio(server, {
 });
 
 
+
+
+// bodyParser middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
 //Port number
 const port = 27017;
 
 app.use(express.json());
 
-// bodyParser middleware
-app.use(bodyParser.json());
+
 
 // cors middleware
 app.use(cors());
 
-app.use(passport.initialize());
+
 
 // all api routes
 app.use('/api', api);
@@ -54,7 +62,7 @@ app.get('/testpage', (req, res) => {
 })
 
 //AngularJS Frontend
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 

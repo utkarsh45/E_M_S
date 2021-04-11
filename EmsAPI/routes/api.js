@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const jwtHelp = require('../config/jwtHelp');
 const User = require('../models/User');
-const passport = require('passport');
-const _ = require('lodash');
+const { auth } = require('../middleware/auth');
+const cookies = require('cookie-parser');
+
+
 
 router.get('/register', async(req, res) => {
     try {
@@ -15,6 +16,7 @@ router.get('/register', async(req, res) => {
 })
 
 router.post('/register', (req, res, next) => {
+
     const user = new User();
     user.fullName = req.body.fullName;
     user.email = req.body.email;
@@ -30,32 +32,56 @@ router.post('/register', (req, res, next) => {
         }
 
     });
-})
+});
+router.post('/login', function(req, res) {
+    let token = req.cookies.auth;
+    user.findByToken(token, (err, user) => {
+        if (err) return res(err);
+        if (user) return res.status(400).json({
+            error: true,
+            message: "You are already logged in"
+        });
 
+        else {
+            user.findOne({ 'email': req.body.email }, function(err, user) {
+                if (!user) return res.json({ isAuth: false, message: ' Auth failed ,email not found' });
 
+                user.comparepassword(req.body.password, (err, isMatch) => {
+                    if (!isMatch) return res.json({ isAuth: false, message: "password doesn't match" });
 
-router.post('/authenticate', async(req, res, next) => {
-    // call for passport authentication
-    passport.authenticate('local', (err, user, info) => {
-        // error from passport middleware
-        if (err) return res.status(404).json(err);
-        // registered user
-        if (user) return res.status(200).json({ "token": user.generateJwt() });
-        // unknown user or wrong password
-        else return res.status(401).json(info);
-    })(req, res);
-})
-
-
-router.post('/dashboard', async(req, res, next) => {
-    User.findOne({ _id: req._id },
-        (err, user) => {
-            if (!user)
-                return res.status(404).json({ status: false, message: 'User record not found.' });
-            else
-                return res.status(200).json({ status: true, user: _.pick(user, ['fullName', 'email']) });
+                    user.generateToken((err, user) => {
+                        if (err) return res.status(400).send(err);
+                        res.cookie('auth', user.token).json({
+                            isAuth: true,
+                            id: user._id,
+                            email: user.email
+                        });
+                    });
+                });
+            });
         }
-    );
-})
+    });
+});
+
+// get logged in user
+router.get('/dashboard', auth, function(req, res) {
+    res.json({
+        isAuth: true,
+        id: req.user._id,
+        email: req.user.email,
+        fullName: req.user.fullName
+
+    })
+});
+
+
+//logout user
+router.get('/logout', auth, function(req, res) {
+    req.user.deleteToken(req.token, (err, user) => {
+        if (err) return res.status(400).send(err);
+        res.sendStatus(200);
+    });
+
+});
 
 module.exports = router;
